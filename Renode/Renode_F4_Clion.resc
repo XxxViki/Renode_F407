@@ -1,0 +1,56 @@
+#
+# Renode 仿真脚本 - STM32F407VGT6 (Renode_F4 工程)
+#
+# 用法:
+#   1. 在 STM32CubeIDE 中编译工程 → 生成 .elf
+#   2. 终端运行: renode Renode_F4.resc
+#   3. 在 Renode Monitor 中输入: start
+#
+# 或者一键启动（去掉下面 start 的注释）
+#
+
+# ============================================================
+# 1. 创建机器
+# ============================================================
+mach create "STM32F407"
+machine LoadPlatformDescription @platforms/cpus/stm32f4.repl
+
+# ============================================================
+# 2. 加载固件 (根据你的 Debug/Release 调整路径)
+# ============================================================
+sysbus LoadELF @../cmake-build-debug/St_F407.elf
+
+# ============================================================
+# 3. UART 输出窗口 (USART4)
+#    如果固件里用 printf 输出到 USART2，会弹出终端窗口显示
+#    语法: showAnalyzer [externalName] [peripheral] ([typeName])
+# ============================================================
+showAnalyzer sysbus.uart4
+
+# 创建 TCP 终端，监听本地 4444 端口
+emulation CreateServerSocketTerminal 4444 "uart4_tcp"
+# 将 TCP 终端连接到模拟的 UART4 外设
+connector Connect sysbus.uart4 uart4_tcp
+
+# ============================================================
+# 4. GPIO 引脚监控 (PD9 + PC6)
+#    LogPeripheralAccess 会记录 GPIOD/GPIOC 所有寄存器写入
+#    配合 logLevel -1 sysbus.gpioPortD 降低日志级别查看
+#    在仿真 log 里看 ODR (偏移0x14) 变化: bit9=PD9, bit6=PC6
+# ============================================================
+#sysbus LogPeripheralAccess sysbus.gpioPortD
+#sysbus LogPeripheralAccess sysbus.gpioPortB
+
+# ============================================================
+# 6. GDB 调试服务
+#    不自动 start，由 CubeIDE 接管：连上→暂停→设断点→运行
+# ============================================================
+machine StartGdbServer 3333
+#cpu ExecutionMode Paused
+
+echo ""
+echo "==========================================="
+echo " STM32F407 GDB Server: localhost:3333"
+echo " 在 CubeIDE 中 Debug → 自动暂停在 main"
+echo "==========================================="
+echo ""
