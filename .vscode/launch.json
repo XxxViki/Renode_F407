@@ -1,0 +1,37 @@
+{
+  // VSCode 调试配置文件版本，固定值
+  "version": "0.2.0",
+  // 调试配置列表，可以定义多个调试配置
+  "configurations": [
+    {
+      // 调试配置名称，显示在 VSCode 调试面板中
+      "name": "Renode Debug (STM32F4)",
+      // 调试器类型，使用 cortex-debug 扩展
+      "type": "cortex-debug",
+      // 请求类型：launch（启动调试）或 attach（附加到已有进程）
+      "request": "launch",
+      // 当前工作目录，${workspaceFolder} 表示 VSCode 打开的工作区根目录
+      "cwd": "${workspaceFolder}",
+      // 要调试的可执行文件路径，.elf 文件包含调试信息
+      "executable": "${workspaceFolder}/build/St_F407.elf",
+      // GDB 服务器类型：external（外部服务器，如 Renode）
+      "servertype": "external",
+      // 外部 GDB 服务器地址和端口，Renode 默认监听 localhost:3333
+      "gdbTarget": "localhost:3333",
+      // GDB 调试器路径，arm-none-eabi-gdb 是 ARM 架构专用的 GDB
+      "gdbPath": "arm-none-eabi-gdb.exe",
+      // 目标设备型号，用于 cortex-debug 识别芯片特性
+      "device": "STM32F407VGTx",
+      // SVD 文件路径，用于显示寄存器信息（STM32CubeCLT 安装路径）
+      "svdFile": "C:\\ST\\STM32CubeCLT_1.18.0\\STMicroelectronics_CMSIS_SVD\\STM32F407.svd",
+      // 调试开始前执行的任务，这里是启动 Renode 仿真器
+      "preLaunchTask": "Start Renode",
+      // 调试结束后执行的任务，这里是关闭 Renode 仿真器
+      "postDebugTask": "Stop Renode",
+      // 调试启动后自动运行到指定函数入口（main函数）
+      "runToEntryPoint": "main",
+      // 是否显示调试器内部输出：none（不显示）、errors（仅错误）、verbose（详细）
+      "showDevDebugOutput": "raw"
+    }
+  ]
+}

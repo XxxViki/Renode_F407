@@ -1,0 +1,100 @@
+{
+  // VSCode 任务配置文件版本，固定值
+  "version": "2.0.0",
+  // 任务列表，可以定义多个任务
+  "tasks": [
+    {
+      // 任务名称，用于在 launch.json 中引用
+      "label": "Start Renode",
+      // 任务类型：shell（执行命令行命令）
+      "type": "shell",
+      // 要执行的命令：启动 Renode 仿真器
+      "command": "renode.exe",
+      // 命令参数：加载 Renode 配置脚本
+      "args": [
+        "${workspaceFolder}/Renode/Renode_F4_VSC.resc"
+      ],
+      // 命令执行选项
+      "options": {
+        // 命令执行的工作目录
+        "cwd": "${workspaceFolder}/Renode"
+      },
+      // 是否为后台任务（不阻塞后续操作）
+      "isBackground": true,
+      // 问题匹配器：用于识别命令输出中的问题（错误/警告）
+      "problemMatcher": {
+        // 问题匹配器所有者标识
+        "owner": "renode",
+        // 输出匹配模式
+        "pattern": {
+          // 正则表达式匹配输出行
+          "regexp": "^(.*)$",
+          // 将匹配内容作为消息
+          "message": 1
+        },
+        // 后台任务的开始/结束标识
+        "background": {
+          // 任务启动时立即激活
+          "activeOnStart": true,
+          // 任务开始的匹配模式（Renode 启动完成的标志）
+          "beginsPattern": "STM32F407 GDB Server: localhost:3333",
+          // 任务结束的匹配模式（与开始相同）
+          "endsPattern": "STM32F407 GDB Server: localhost:3333"
+        }
+      }
+    },
+    {
+      // 任务名称：停止 Renode
+      "label": "Stop Renode",
+      // 任务类型：shell
+      "type": "shell",
+      // 命令：Windows 任务终止命令
+      "command": "taskkill",
+      // 参数：强制终止 renode.exe 进程
+      "args": [
+        "/F",        // 强制终止
+        "/IM",       // 按进程名终止
+        "renode.exe" // 进程名称
+      ],
+      // 无问题匹配器（不需要解析输出）
+      "problemMatcher": []
+    },
+    {
+      // 任务名称：构建项目
+      "label": "Build",
+      // 任务类型：shell
+      "type": "shell",
+      // 命令：CMake 构建命令
+      "command": "cmake",
+      // 参数：构建 build 目录
+      "args": [
+        "--build",
+        "${workspaceFolder}/build"
+      ],
+      // 命令执行选项
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      // 问题匹配器：识别 GCC 编译错误和警告
+      "problemMatcher": {
+        "owner": "gcc",
+        // 文件路径为绝对路径
+        "fileLocation": "absolute",
+        // GCC 错误格式正则表达式
+        "pattern": {
+          "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+          "file": 1,      // 第1组：文件名
+          "line": 2,      // 第2组：行号
+          "column": 3,    // 第3组：列号
+          "severity": 4,  // 第4组：严重级别（warning/error）
+          "message": 5    // 第5组：错误消息
+        }
+      },
+      // 任务分组配置
+      "group": {
+        "kind": "build",     // 属于构建任务组
+        "isDefault": true    // 设为默认构建任务
+      }
+    }
+  ]
+}
