@@ -64,13 +64,19 @@ xSemaphoreHandle xUart4Mutex;
 
 void vTaskLED1(void *pvParameters)
 {
-    const TickType_t xDelay = pdMS_TO_TICKS(2000);
+    const TickType_t xDelay = pdMS_TO_TICKS(500);
     uint8_t string[] = "Task ------------- \r\n";
     for(;;)
     {
         if (xSemaphoreTake(xUart4Mutex, portMAX_DELAY) == pdTRUE)
         {
-            HAL_UART_Transmit(&huart4, (uint8_t *)string, sizeof(string), 100);
+          HAL_UART_Transmit(&huart4, (uint8_t *)string, sizeof(string), 100);
+
+          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+          vTaskDelay(500);
+          HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+          vTaskDelay(500);
+
             xSemaphoreGive(xUart4Mutex);
         }
         vTaskDelay(xDelay);
@@ -85,8 +91,20 @@ void vTaskLED2(void *pvParameters)
     {
         if (xSemaphoreTake(xUart4Mutex, portMAX_DELAY) == pdTRUE)
         {
-            HAL_UART_Transmit(&huart4, (uint8_t *)string, sizeof(string), 100);
-            xSemaphoreGive(xUart4Mutex);
+          uint8_t pinState = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_8);
+            if (pinState == GPIO_PIN_SET)
+            {
+                // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
+              HAL_UART_Transmit(&huart4, (uint8_t *)string, sizeof(string), 100);
+              pinState = GPIO_PIN_RESET;
+            }
+            else
+            {
+              // HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+              // HAL_UART_Transmit(&huart4, (uint8_t *)string, sizeof(string), 100);
+            }
+
+          xSemaphoreGive(xUart4Mutex);
         }
         vTaskDelay(xDelay);
     }

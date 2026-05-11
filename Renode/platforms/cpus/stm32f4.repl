@@ -328,4 +328,4 @@ UserButton: Miscellaneous.Button @ gpioPortA
 UserLED: Miscellaneous.LED @ gpioPortD
 
 gpioPortD:
-    12 -> UserLED@0
+   8 -> UserLED@0

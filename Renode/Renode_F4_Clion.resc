@@ -26,11 +26,8 @@ sysbus LoadELF @../cmake-build-debug/St_F407.elf
 #    语法: showAnalyzer [externalName] [peripheral] ([typeName])
 # ============================================================
 showAnalyzer sysbus.uart4
-
-# 创建 TCP 终端，监听本地 4444 端口
-emulation CreateServerSocketTerminal 4444 "uart4_tcp"
-# 将 TCP 终端连接到模拟的 UART4 外设
-connector Connect sysbus.uart4 uart4_tcp
+# 开启 GPIO 引脚的波形记录
+#showAnalyzer sysbus.gpioPortD
 
 # ============================================================
 # 4. GPIO 引脚监控 (PD9 + PC6)
@@ -40,6 +37,7 @@ connector Connect sysbus.uart4 uart4_tcp
 # ============================================================
 #sysbus LogPeripheralAccess sysbus.gpioPortD
 #sysbus LogPeripheralAccess sysbus.gpioPortB
+
 
 # ============================================================
 # 6. GDB 调试服务
@@ -54,3 +52,40 @@ echo " STM32F407 GDB Server: localhost:3333"
 echo " 在 CubeIDE 中 Debug → 自动暂停在 main"
 echo "==========================================="
 echo ""
+
+# ++++++++++++++++++++++操作行为+++++++++++++++++++++++++++
+
+#-----------------------GPIO------------------------------
+python
+"""
+import time
+def mc_PD8_trigger(pin, delay):
+    gpu = self.Machine["sysbus.gpioPortD"]
+    gpu.OnGPIO(int(pin), True)
+    print('PD8 is now HIGH')
+    time.sleep(float(delay))
+    gpu.OnGPIO(int(pin), False)
+    print('PD8 is now LOW')
+
+#sysbus.gpioPortD OnGPIO 8 true
+
+def mc_pd8_on():
+    pd8 = self.Machine["sysbus.gpioPortD"]
+    pd8.OnGPIO(8, True)
+    print('PD8 is now HIGH')
+
+def mc_pd8_off():
+    gpu = self.Machine["sysbus.gpioPortD"]
+    gpu.OnGPIO(8, False)
+    print('PD8 is now LOW')
+
+
+"""
+
+
+#-----------------------UART------------------------------
+
+# 创建 TCP 终端，监听本地 4444 端口
+emulation CreateServerSocketTerminal 4444 "uart4_tcp"
+# 将 TCP 终端连接到模拟的 UART4 外设
+connector Connect sysbus.uart4 uart4_tcp

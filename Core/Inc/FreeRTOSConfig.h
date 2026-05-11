@@ -52,6 +52,9 @@ extern uint32_t SystemCoreClock;
 //#define configUSE_TICK_HOOK				1
 //#define configCHECK_FOR_STACK_OVERFLOW	2
 //#define configUSE_MALLOC_FAILED_HOOK	1
+//clion显示栈信息
+#define configRECORD_STACK_HIGH_ADDRESS    1
+#define configGENERATE_RUN_TIME_STATS      1
 	#define configUSE_IDLE_HOOK				0
 	#define configUSE_TICK_HOOK				0
 #define configCPU_CLOCK_HZ				( SystemCoreClock )
